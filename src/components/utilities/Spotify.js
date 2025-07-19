@@ -29,6 +29,9 @@ const Spotify = {
     const codeVerifier = generateCodeVerifier();
     localStorage.setItem('code_verifier', codeVerifier);
     console.log('Storing code_verifier:', codeVerifier);
+
+    localStorage.removeItem('access_token'); // 👈 Add this line
+
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
     window.location = authUrl;
@@ -36,8 +39,11 @@ const Spotify = {
 
   async getAccessToken() {
     if (accessToken) return accessToken;
-    accessToken = localStorage.getItem('access_token');
-    if (accessToken) return accessToken;
+    const storedToken = localStorage.getItem('access_token');
+    if (storedToken) {
+        accessToken = storedToken;
+        return accessToken;
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
