@@ -30,20 +30,31 @@ const Spotify = {
     localStorage.setItem('code_verifier', codeVerifier);
     console.log('Storing code_verifier:', codeVerifier);
 
-    localStorage.removeItem('access_token'); // 👈 Add this line
+    // Clear both localStorage and module-level cache
+    localStorage.removeItem('access_token');
+    accessToken = null;
 
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
     window.location = authUrl;
   },
 
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('code_verifier');
+    accessToken = null;
+  },
+
   async getAccessToken() {
-    if (accessToken) return accessToken;
+    // Always check localStorage first to ensure we get the most recent token
     const storedToken = localStorage.getItem('access_token');
     if (storedToken) {
         accessToken = storedToken;
         return accessToken;
     }
+    
+    // If no stored token, check if we have a cached one
+    if (accessToken) return accessToken;
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');

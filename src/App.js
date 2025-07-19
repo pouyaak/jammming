@@ -23,6 +23,13 @@ function App() {
     await Spotify.startLogin();
   };
 
+  const handleLogout = () => {
+    Spotify.logout();
+    setIsLoggedIn(false);
+    setSearchResults([]);
+    setPlaylistTracks([]);
+  };
+
   const addTrack = (track) => {
     if (playlistTracks.find(savedTrack => savedTrack.id === track.id)) return;
     setPlaylistTracks(prev => [...prev, track]);
@@ -52,6 +59,18 @@ function App() {
         <LoginButton onLogin={handleLogin} />
       ) : (
         <>
+          <button 
+            onClick={handleLogout} 
+            style={{ 
+              position: 'absolute', 
+              top: '10px', 
+              right: '10px', 
+              padding: '5px 10px',
+              fontSize: '12px'
+            }}
+          >
+            Logout
+          </button>
           <SearchBar onSearch={searchSpotify}/>
           <div className="App-playlist">
             <SearchResults searchResults={searchResults} onAdd={addTrack} />
