@@ -1,5 +1,5 @@
 const clientId = '311cd09e993f41f7b56314c6c9d9a828';
-const redirectUri = 'https://jammming-smoky.vercel.app';
+const redirectUri = 'https://jammming-phi.vercel.app';
 const scopes = 'playlist-modify-public';
 
 // PKCE helper functions
