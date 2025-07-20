@@ -231,62 +231,50 @@ const Spotify = {
     
     console.log('Searching with token:', token.substring(0, 20) + '...');
     
-    // First, let's test the token with a simple API call
+    // Skip token validation for now - go straight to search
+    console.log('Proceeding with search without token validation...');
+    
     try {
-      const testResponse = await fetch('https://api.spotify.com/v1/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}&limit=20`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       
-      if (!testResponse.ok) {
-        console.error('Token test failed:', testResponse.status, testResponse.statusText);
-        const errorData = await testResponse.json().catch(() => ({}));
-        console.error('Error details:', errorData);
+      console.log('Search response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('Spotify API error:', response.status, response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Search error details:', errorData);
         
-        if (testResponse.status === 401 || testResponse.status === 403) {
-          console.log('Token is invalid, clearing cache...');
+        if (response.status === 401 || response.status === 403) {
+          console.log('Token might be expired, clearing cache...');
           localStorage.removeItem('access_token');
           accessToken = null;
-          return [];
         }
-      } else {
-        const userData = await testResponse.json();
-        console.log('Token is valid for user:', userData.display_name);
+        return [];
       }
-    } catch (error) {
-      console.error('Error testing token:', error);
-    }
-    
-    const response = await fetch(
-      `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    
-    if (!response.ok) {
-      console.error('Spotify API error:', response.status, response.statusText);
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Search error details:', errorData);
       
-      if (response.status === 401 || response.status === 403) {
-        console.log('Token might be expired, clearing cache...');
-        localStorage.removeItem('access_token');
-        accessToken = null;
-      }
+      const jsonResponse = await response.json();
+      console.log('Search response:', jsonResponse);
+      
+      if (!jsonResponse.tracks) return [];
+      return jsonResponse.tracks.items.map((track) => ({
+        id: track.id,
+        name: track.name,
+        artist: track.artists[0].name,
+        album: track.album.name,
+        uri: track.uri,
+      }));
+    } catch (error) {
+      console.error('Network error during search:', error);
       return [];
     }
-    
-    const jsonResponse = await response.json();
-    if (!jsonResponse.tracks) return [];
-    return jsonResponse.tracks.items.map((track) => ({
-      id: track.id,
-      name: track.name,
-      artist: track.artists[0].name,
-      album: track.album.name,
-      uri: track.uri,
-    }));
   },
 
   async savePlaylist(name, trackURIs) {
