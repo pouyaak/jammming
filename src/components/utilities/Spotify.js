@@ -35,11 +35,12 @@ const Spotify = {
     accessToken = null;
 
     const codeChallenge = await generateCodeChallenge(codeVerifier);
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}&show_dialog=true`;
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}&show_dialog=true&force_approve=true`;
     
     console.log('Redirecting to Spotify auth URL:', authUrl);
     console.log('Redirect URI being used:', redirectUri);
     console.log('Client ID being used:', clientId);
+    console.log('Scopes being requested:', scopes);
     
     window.location = authUrl;
   },
@@ -200,19 +201,20 @@ const Spotify = {
         
         console.log('Token exchange response status:', response.status);
         
-        const data = await response.json();
-        console.log('Token exchange response:', data);
-        
-        if (data.access_token) {
-          accessToken = data.access_token;
-          localStorage.setItem('access_token', accessToken);
-          window.history.replaceState({}, document.title, '/');
-          console.log('Successfully obtained access token');
-          return accessToken;
-        } else {
-          console.error('Failed to obtain access token:', data);
-          return null;
-        }
+              const data = await response.json();
+      console.log('Token exchange response:', data);
+      
+      if (data.access_token) {
+        accessToken = data.access_token;
+        localStorage.setItem('access_token', accessToken);
+        window.history.replaceState({}, document.title, '/');
+        console.log('Successfully obtained access token');
+        console.log('Token scopes:', data.scope || 'No scopes returned');
+        return accessToken;
+      } else {
+        console.error('Failed to obtain access token:', data);
+        return null;
+      }
       } catch (error) {
         console.error('Error during token exchange:', error);
         return null;
@@ -229,6 +231,31 @@ const Spotify = {
     
     console.log('Searching with token:', token.substring(0, 20) + '...');
     
+    // First, let's test the token with a simple API call
+    try {
+      const testResponse = await fetch('https://api.spotify.com/v1/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!testResponse.ok) {
+        console.error('Token test failed:', testResponse.status, testResponse.statusText);
+        const errorData = await testResponse.json().catch(() => ({}));
+        console.error('Error details:', errorData);
+        
+        if (testResponse.status === 401 || testResponse.status === 403) {
+          console.log('Token is invalid, clearing cache...');
+          localStorage.removeItem('access_token');
+          accessToken = null;
+          return [];
+        }
+      } else {
+        const userData = await testResponse.json();
+        console.log('Token is valid for user:', userData.display_name);
+      }
+    } catch (error) {
+      console.error('Error testing token:', error);
+    }
+    
     const response = await fetch(
       `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,
       {
@@ -240,6 +267,9 @@ const Spotify = {
     
     if (!response.ok) {
       console.error('Spotify API error:', response.status, response.statusText);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Search error details:', errorData);
+      
       if (response.status === 401 || response.status === 403) {
         console.log('Token might be expired, clearing cache...');
         localStorage.removeItem('access_token');
