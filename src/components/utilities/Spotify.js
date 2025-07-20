@@ -1,6 +1,6 @@
 const clientId = '311cd09e993f41f7b56314c6c9d9a828';
 const redirectUri = 'https://jammming-phi.vercel.app';
-const scopes = 'playlist-modify-public user-read-private user-read-email';
+const scopes = 'playlist-modify-public user-read-private user-read-email user-read-playback-state user-read-currently-playing';
 
 // PKCE helper functions
 function generateCodeVerifier(length = 128) {
@@ -235,15 +235,17 @@ const Spotify = {
     console.log('Proceeding with search without token validation...');
     
     try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}&limit=20`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // Try a simpler search first
+      const searchUrl = `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}&limit=20`;
+      console.log('Making request to:', searchUrl);
+      
+      const response = await fetch(searchUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
       
       console.log('Search response status:', response.status);
       
@@ -251,6 +253,34 @@ const Spotify = {
         console.error('Spotify API error:', response.status, response.statusText);
         const errorData = await response.json().catch(() => ({}));
         console.error('Search error details:', errorData);
+        
+        // Try a different approach - maybe the issue is with the search endpoint
+        console.log('Trying alternative search approach...');
+        const altResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(term)}&type=track`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        });
+        
+        console.log('Alternative search response status:', altResponse.status);
+        
+        if (altResponse.ok) {
+          const altJsonResponse = await altResponse.json();
+          console.log('Alternative search response:', altJsonResponse);
+          
+          if (!altJsonResponse.tracks) return [];
+          return altJsonResponse.tracks.items.map((track) => ({
+            id: track.id,
+            name: track.name,
+            artist: track.artists[0].name,
+            album: track.album.name,
+            uri: track.uri,
+          }));
+        } else {
+          console.error('Alternative search also failed:', altResponse.status, altResponse.statusText);
+        }
         
         if (response.status === 401 || response.status === 403) {
           console.log('Token might be expired, clearing cache...');
