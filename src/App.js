@@ -37,8 +37,7 @@ function App() {
       if (isValid) {
         setIsLoggedIn(true);
       } else {
-        // Clear invalid tokens
-        Spotify.logout();
+      
         setIsLoggedIn(false);
       }
     }
