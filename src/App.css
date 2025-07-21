@@ -1,3 +1,7 @@
+#banner {
+  margin: 20px;
+}
+
 .SearchBar {
   display: flex;
   flex-direction: column;
@@ -10,12 +14,14 @@
   padding: 10px;
   margin-bottom: 10px;
   font-size: 1rem;
+  background-color: rgb(79, 75, 75);
 }
 
 .SearchBar button {
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
+  margin: 15px;
 }
 
 h1 {
@@ -29,6 +35,7 @@ h1 {
   margin: 50px;
 }
 
+
 .Playlist {
   display: flex;
   flex-direction: column;
@@ -37,12 +44,30 @@ h1 {
 }
 
 .Playlist-save {
-  margin: 20px;
+  margin: 30px;
+  padding: 7px;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: white;
+  background-color: #121212;
+  color: #fff;
+}
+
+button {
+  background-color: #00ff59a7;
+  border-radius: 6px;
+  border: none;
+}
+
+.Track {
+  display: flex;
+  margin: 15px;
+}
+
+.Track-action {
+  padding: 10px;
+  margin: 15px;
 }

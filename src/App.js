@@ -76,7 +76,7 @@ function App() {
 
   return (
     <div>
-      <h1> Wellcome to Jammming</h1>
+      <h1 id="banner"> Wellcome to Jammming</h1>
       {!isLoggedIn ? (
         <div>
           <LoginButton onLogin={handleLogin} />
