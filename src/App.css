@@ -15,6 +15,8 @@
   margin-bottom: 10px;
   font-size: 1rem;
   background-color: rgb(79, 75, 75);
+  border-radius: 8px;
+  border: none;
 }
 
 .SearchBar button {
@@ -48,18 +50,27 @@ h1 {
   padding: 7px;
 }
 
+.Playlist input {
+  background-color: rgb(79, 75, 75);
+  border-radius: 6px;
+  padding: 8px;
+  border: none;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background-color: #121212;
   color: #fff;
+  font-family: "Inter";
 }
 
 button {
   background-color: #00ff59a7;
   border-radius: 6px;
   border: none;
+  cursor: pointer;
 }
 
 .Track {
@@ -70,4 +81,16 @@ button {
 .Track-action {
   padding: 10px;
   margin: 15px;
+}
+
+.Track {
+  border: 1px solid;
+  border-color: #ffffff73;
+  border-radius: 9px;
+  padding: 10px;
+  margin: 20px;
+}
+
+.pop {
+  background-color: gray;
 }

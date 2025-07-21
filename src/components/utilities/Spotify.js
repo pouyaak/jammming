@@ -1,6 +1,6 @@
 const clientId = '311cd09e993f41f7b56314c6c9d9a828';
-const redirectUri = 'https://jammming-phi.vercel.app';
-// const redirectUri = 'http://127.0.0.1:3000/';
+// const redirectUri = 'https://jammming-phi.vercel.app';
+const redirectUri = 'http://127.0.0.1:3000/';
 const scopes = 'playlist-modify-public user-read-private user-read-email user-read-playback-state user-read-currently-playing';
 
 // PKCE helper functions

@@ -86,11 +86,13 @@ function App() {
           <button 
             onClick={handleLogout} 
             style={{ 
-              position: 'absolute', 
-              top: '10px', 
+              position: 'fixed', 
+              bottom: '10px', 
               right: '10px', 
               padding: '5px 10px',
-              fontSize: '12px'
+              fontSize: '12px',
+              margin: "10px",
+              cursor: "pointer",
             }}
           >
             Logout
