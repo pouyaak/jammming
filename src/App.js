@@ -77,7 +77,7 @@ function App() {
 
   return (
     <div>
-      <h1> GI BEKHOR </h1>
+      <h1> Wellcome to Jammming</h1>
       {!isLoggedIn ? (
         <div>
           <LoginButton onLogin={handleLogin} />
