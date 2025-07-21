@@ -71,6 +71,7 @@ button {
   border-radius: 6px;
   border: none;
   cursor: pointer;
+  color:black;
 }
 
 .Track {
