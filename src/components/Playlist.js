@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TrackList from './TrackList';
 
-function Playlist({ playlistTracks, onRemove, onSave }) {
+function Playlist({ playlistTracks, onRemove, onSave, message, setMessage }) {
     const [playlistName, setPlaylistName] = useState('New Playlist');
 
     const handleNameChange = (e) => {
@@ -27,6 +27,7 @@ function Playlist({ playlistTracks, onRemove, onSave }) {
             <button className="Playlist-save" onClick={handleSave}>
                 SAVE TO SPOTIFY
             </button>
+            {message && <p className="save-message">{message}</p>}
         </div>
     );
 }

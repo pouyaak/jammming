@@ -10,7 +10,7 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [message, setMessage] = useState('')
   useEffect(() => {
     async function checkToken() {
       // Check if we're on the correct domain
@@ -64,6 +64,8 @@ function App() {
   const savePlaylist = async (playlistName) => {
     const trackURIs = playlistTracks.map(track => track.uri);
     await Spotify.savePlaylist(playlistName, trackURIs);
+    setMessage('🎉 Playlist saved to your Spotify!');
+    setTimeout(() => setMessage(''), 3000)
     setPlaylistTracks([]);
   };
 
@@ -104,6 +106,8 @@ function App() {
               playlistTracks={playlistTracks} 
               onRemove={removeTrack} 
               onSave={savePlaylist}
+              message={message}
+              setMessage={setMessage}
             />
           </div>
         </>
