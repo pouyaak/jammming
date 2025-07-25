@@ -6,7 +6,8 @@ function SelectedPlaylistPanel({ playlist, className }) {
 
     return (
         <div className={className}>
-            <h2>{playlist.name}</h2>
+            <h2>SelectedPlaylist:</h2>
+            <h3>{playlist.name}</h3>
             {playlist.tracks?.items?.length > 0 ? (
                 <ul>
                     {playlist.tracks.items.map((item, index) => (

@@ -132,7 +132,7 @@ function App() {
             Logout
           </button>
           <SearchBar onSearch={searchSpotify}/>
-          
+
           <div className="App-playlist">
             <SearchResults searchResults={searchResults} onAdd={addTrack} />
             <Playlist 
@@ -153,11 +153,12 @@ function App() {
                 />
               </div>
 
-              <div className='selected-panel'>
-                {selectedPlaylist && (
-                <SelectedPlaylistPanel playlist={selectedPlaylist} playlistTracks={playlistTracks} />
-                )}
-              </div>
+              {selectedPlaylist && (
+                <div className='selected-panel'>
+                  <SelectedPlaylistPanel playlist={selectedPlaylist} playlistTracks={playlistTracks} />
+                </div>
+              )}
+
           </div>
         </>
       )}
