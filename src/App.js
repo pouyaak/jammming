@@ -5,12 +5,17 @@ import SearchResults from './components/SearchResults';
 import Playlist from './components/Playlist';
 import Spotify from './components/utilities/Spotify';
 import LoginButton from './components/LoginButton';
+import PlaylistSelector from './components/PlaylistSelector';
+import SelectedPlaylistPanel from './components/SelectedPlaylistPanel';
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState('');
+  const [userPlaylists, setUserPlaylists] = useState([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null)
+
   useEffect(() => {
     async function checkToken() {
       // Check if we're on the correct domain
@@ -44,6 +49,15 @@ function App() {
     checkToken();
   }, []);
 
+  useEffect(() => {
+    if(isLoggedIn) {
+      Spotify.getUserPlaylists().then(playlists => {
+        console.log('Fetched playlists:', playlists);
+        setUserPlaylists(playlists);
+      });
+    }
+  }, [isLoggedIn]);
+
   const handleLogin = async () => {
     await Spotify.startLogin();
   };
@@ -76,6 +90,24 @@ function App() {
     setSearchResults(results);
   }; 
 
+
+  const handleSelectPlaylist = async (playlist) => {
+    const token = await Spotify.getAccessToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const jsonResponse = await response.json();
+
+    const playlistWithTracks = { ...playlist, tracks: jsonResponse };
+    setSelectedPlaylist(playlistWithTracks);
+  };
+
+
+  console.log("Rendering App - isLoggedIn:", isLoggedIn, "userPlaylists.length:", userPlaylists.length);
+
   return (
     <div>
       <h1 id="banner"> Wellcome to Jammming</h1>
@@ -100,6 +132,7 @@ function App() {
             Logout
           </button>
           <SearchBar onSearch={searchSpotify}/>
+          
           <div className="App-playlist">
             <SearchResults searchResults={searchResults} onAdd={addTrack} />
             <Playlist 
@@ -109,6 +142,22 @@ function App() {
               message={message}
               setMessage={setMessage}
             />
+          </div>
+
+          <div className='playlist-section'>
+
+              <div className='your-playlists'>
+                <PlaylistSelector 
+                playlists={userPlaylists}
+                onSelect={handleSelectPlaylist}
+                />
+              </div>
+
+              <div className='selected-panel'>
+                {selectedPlaylist && (
+                <SelectedPlaylistPanel playlist={selectedPlaylist} playlistTracks={playlistTracks} />
+                )}
+              </div>
           </div>
         </>
       )}

@@ -3,7 +3,7 @@ const redirectUri = 'https://jammming-phi.vercel.app';
 // const redirectUri = 'http://127.0.0.1:3000/';
 const scopes = 'playlist-modify-public user-read-private user-read-email user-read-playback-state user-read-currently-playing';
 
-// PKCE helper functions
+
 function generateCodeVerifier(length = 128) {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
   let codeVerifier = '';
@@ -223,6 +223,19 @@ const Spotify = {
     }
   },
 
+  async getUserPlaylists() {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) return [];
+
+    const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+      headers: { Authorization: `Bearer ${accessToken}`},
+    });
+    
+
+    const jsonResponse = await response.json();
+    return jsonResponse.items || [];
+  },
+
   async search(term) {
     const token = await Spotify.getAccessToken();
     if (!token) {
@@ -336,6 +349,18 @@ const Spotify = {
       }
     );
   },
+  async getPlaylistDetails(playlistId) {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) return null;
+
+    const endpoint = `https://api.spotify.com/v1/playlists/${playlistId}`;
+
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: ""
+      }
+    })
+  }
 };
 
 export default Spotify;

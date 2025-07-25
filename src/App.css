@@ -61,7 +61,7 @@ h1 {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #121212;
+  background-color: #000000;
   color: #fff;
   font-family: "Inter";
 }
@@ -95,4 +95,85 @@ button {
 
 .pop {
   background-color: gray;
+}
+
+.playlist-section {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+  padding: 30px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  border: 3px solid #888;
+  border-radius: 10px;
+  gap: 40px;
+  justify-content: center;
+}
+
+.selected-panel {
+  margin: 20px;
+  padding: 30px;
+  width: 40%;
+  flex: 2;
+}
+
+.selected-panel li {
+  list-style: number;
+  padding: 9px;
+  margin: 12px;
+  border: 1px solid grey;
+  border-radius: 5px;
+}
+
+.selected-panel li:hover {
+  cursor: pointer;
+  background-color: #444;
+  border: 2px solid grey;
+  border-radius: 5px;
+}
+
+.your-playlists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex:1;
+  list-style: none;
+  padding: 5px;
+  margin: 3px;
+  list-style: none;
+  counter-reset: item;
+}
+
+.your-playlists li {
+  cursor: pointer;
+  padding: 4px;
+  list-style: none;
+  margin: 9px;
+  display: inline-flex;
+  border: 1px solid grey;
+  border-radius: 5px;
+  counter-increment: item;
+}
+
+.your-playlists li:hover {
+  background: #444;
+}
+
+.your-playlists li::before {
+  content: counter(item) '. ';
+  left: 6px;
+  color: #aaa;
+  padding: 2px;
+} 
+
+.App-playlist {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.playlist-selector h2 {
+  text-align: center;
+  margin-bottom: 25px;
 }
