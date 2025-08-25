@@ -1,6 +1,6 @@
 const clientId = '311cd09e993f41f7b56314c6c9d9a828';
-// const redirectUri = 'https://jammming-phi.vercel.app'; 
-const redirectUri = 'http://127.0.0.1:3000/';
+const redirectUri = 'https://jammming-phi.vercel.app'; 
+// const redirectUri = 'http://127.0.0.1:3000/';
 const scopes = 'playlist-modify-public playlist-modify-private user-read-private user-read-email user-read-playback-state user-read-currently-playing';
 
 
@@ -395,6 +395,7 @@ const Spotify = {
     if(!createRes.ok) {
       throw new Error ('F')
     }
+
 
     const addRes = await fetch(`https://api.spotify.com/v1/playlists/${created.id}/tracks`, {
       method: "POST",

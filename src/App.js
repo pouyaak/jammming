@@ -91,9 +91,13 @@ function App() {
 
   const savePlaylist = async (userPlaylists) => {
     const trackURIs = playlistTracks.map(track => track.uri);
-    await Spotify.savePlaylist(userPlaylists, trackURIs);
+    const created = await Spotify.savePlaylist(userPlaylists, trackURIs);
     setMessage('🎉 Playlist saved to your Spotify!');
     setTimeout(() => setMessage(''), 3000)
+    setUserPlaylists(prev => [
+      { id: created.id, name: created.name, tracks: [] },
+      ...prev
+    ])
     setPlaylistTracks([]);
   };
 
