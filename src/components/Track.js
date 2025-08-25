@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
 
-function Track({ track, onAdd, isRemoval }) {
+function Track({ track, onAdd, onRemove, isRemoval }) {
     const [isPopping, setIsPopping] = useState(false)
     const addTrack = () => {
         onAdd(track);
@@ -11,6 +11,16 @@ function Track({ track, onAdd, isRemoval }) {
     const removeTrack = () => {
         onAdd(track);
     };
+
+    // const handleClick = () => {
+    //     if (isRemoval && onRemove) {
+    //         onRemove(track);
+    //     } else if (onAdd) {
+    //         onAdd(track);
+    //         setIsPopping(true)
+    //         setTimeout(() => setIsPopping(false), 500);
+    //     }
+    // }
 
     return (
         <div className="Track">
@@ -24,6 +34,9 @@ function Track({ track, onAdd, isRemoval }) {
                 onClick={isRemoval ? removeTrack : addTrack}>
                 {isRemoval ? '-' : '+'}
             </button>
+            {/* <button onClick={handleClick}>
+                {isRemoval ? '-' : '+'}
+            </button> */}
         </div>
     );
 }

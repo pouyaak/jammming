@@ -1,7 +1,7 @@
 const clientId = '311cd09e993f41f7b56314c6c9d9a828';
-const redirectUri = 'https://jammming-phi.vercel.app';
-// const redirectUri = 'http://127.0.0.1:3000/';
-const scopes = 'playlist-modify-public user-read-private user-read-email user-read-playback-state user-read-currently-playing';
+// const redirectUri = 'https://jammming-phi.vercel.app'; 
+const redirectUri = 'http://127.0.0.1:3000/';
+const scopes = 'playlist-modify-public playlist-modify-private user-read-private user-read-email user-read-playback-state user-read-currently-playing';
 
 
 function generateCodeVerifier(length = 128) {
@@ -38,6 +38,7 @@ const Spotify = {
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&code_challenge_method=S256&code_challenge=${codeChallenge}&show_dialog=true&force_approve=true`;
     
+
     console.log('Redirecting to Spotify auth URL:', authUrl);
     console.log('Redirect URI being used:', redirectUri);
     console.log('Client ID being used:', clientId);
@@ -227,8 +228,9 @@ const Spotify = {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) return [];
 
-    const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+    const response = await fetch(`https://api.spotify.com/v1/me/playlists?limit=50&_=${Date.now()}`, {
       headers: { Authorization: `Bearer ${accessToken}`},
+      cache: 'no-store',
     });
     
 
@@ -321,46 +323,90 @@ const Spotify = {
     }
   },
 
-  async savePlaylist(name, trackURIs) {
-    if (!name || !trackURIs.length) return;
-    const token = await Spotify.getAccessToken();
-    if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
-    let userId;
-    const response = await fetch('https://api.spotify.com/v1/me', { headers });
-    const jsonResponse = await response.json();
-    userId = jsonResponse.id;
-    const createPlaylistResponse = await fetch(
-      `https://api.spotify.com/v1/users/${userId}/playlists`,
-      {
-        headers: headers,
-        method: 'POST',
-        body: JSON.stringify({ name: name }),
-      }
-    );
-    const createPlaylistJsonResponse = await createPlaylistResponse.json();
-    const playlistId = createPlaylistJsonResponse.id;
-    await fetch(
-      `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
-      {
-        headers: headers,
-        method: 'POST',
-        body: JSON.stringify({ uris: trackURIs }),
-      }
-    );
-  },
-  async getPlaylistDetails(playlistId) {
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) return null;
-
-    const endpoint = `https://api.spotify.com/v1/playlists/${playlistId}`;
-
-    const response = await fetch(endpoint, {
+  addTracksToPlaylist: async function(playlistId, uris) {
+    const accessToken = await Spotify.getAccessToken();
+    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'POST',
       headers: {
-        Authorization: ""
-      }
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ uris })
+    });
+  },
+
+  removeTracksFromPlaylist: async function(playlistid, uris) {
+    const accessToken = await Spotify.getAccessToken()
+    const payload = {
+      tracks: uris.map(uri => ({ uri }))
+    };
+  
+    console.log("Attempting to remove tracks with payload:", payload);
+
+    return fetch (`https://api.spotify.com/v1/playlists/${playlistid}/tracks`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     })
+    .then(response => {
+      console.log('Response status:', response.status);
+      return response.json().then(data => {
+        console.log("spotify API delete response:", data);
+      })
+    })
+    .catch(error => {
+      console.error('Error deleting track:', error)
+    })
+  },
+
+  unfollowPlaylist: async function(playlistId) {
+    const accessToken = await Spotify.getAccessToken();
+    const res = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(playlistId)}/followers`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Unfollow failed: ${res.status} ${res.statusText} ${text}`)
+    } 
+    return true;
+  },
+
+  savePlaylist: async function (name, trackURIs) {
+    const accessToken = await Spotify.getAccessToken();
+
+    const createRes =  await fetch('https://api.spotify.com/v1/me/playlists', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name
+      })
+    });
+    const created = await createRes.json();
+    if(!createRes.ok) {
+      throw new Error ('F')
+    }
+
+    const addRes = await fetch(`https://api.spotify.com/v1/playlists/${created.id}/tracks`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': "application'json"
+      },
+      body: JSON.stringify({ uris: trackURIs})
+    });
+    return created;
   }
-};
+  
+}
 
 export default Spotify;
