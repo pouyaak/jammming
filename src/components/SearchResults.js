@@ -26,6 +26,8 @@ function SearchResults({ searchResults, onAdd, onAddToSelected, hasSelected }) {
             >
               Add To Selected
             </button>
+            <img src={track.cover} style={{ width: '60px'}}/>
+            
           </div>
         ))
       )}

@@ -293,6 +293,8 @@ const Spotify = {
             artist: track.artists[0].name,
             album: track.album.name,
             uri: track.uri,
+            cover: track.album?.images?.[1]?.url || track.album?.images?.[0]?.url || '',
+            preview: track.preview_url || null,
           }));
         } else {
           console.error('Alternative search also failed:', altResponse.status, altResponse.statusText);
@@ -316,12 +318,15 @@ const Spotify = {
         artist: track.artists[0].name,
         album: track.album.name,
         uri: track.uri,
+        cover: track.album?.images?.[1]?.url || track.album?.images?.[0]?.url || '',
+        preview: track.preview_url || null,
       }));
     } catch (error) {
       console.error('Network error during search:', error);
       return [];
     }
   },
+
 
   addTracksToPlaylist: async function(playlistId, uris) {
     const accessToken = await Spotify.getAccessToken();
@@ -401,7 +406,7 @@ const Spotify = {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': "application'json"
+        'Content-Type': "application/json"
       },
       body: JSON.stringify({ uris: trackURIs})
     });

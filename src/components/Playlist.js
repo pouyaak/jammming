@@ -21,7 +21,7 @@ function Playlist({ playlistTracks, onRemove, onSave, message, setMessage }) {
             />
             <TrackList 
                 tracks={playlistTracks} 
-                onAdd={onRemove} 
+                onRemove={onRemove} 
                 isRemoval={true} 
             />
             <button className="Playlist-save" onClick={handleSave}>
